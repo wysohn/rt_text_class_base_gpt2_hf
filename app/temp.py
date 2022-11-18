@@ -4,9 +4,10 @@ import torch
 
 if __name__ == '__main__':
     hyper_parameters = {
-        'batch_size': 4,
+        'batch_size': 2,
         'max_length': 64,
         'epoch': 32,
+        'sample_size': 4,
     }
 
     model = Model(hyper_parameters)
@@ -25,9 +26,10 @@ if __name__ == '__main__':
         }}, {})
 
     df = pd.DataFrame({
-        'Id': [1, 2],
-        'Category': ['a', 'b'],
-        'Message': ["Replace me by any text you'd like.", "Other sample"]
+        'Id': [1, 2, 3, 4],
+        'Category': ['a', 'b', 'a', 'b'],
+        'Message': ["Replace me by any text you'd like.", "Other sample",
+                    "Replace me by any text you'd like.", "Other sample"]
     })
 
     preprocessor.fit(df)

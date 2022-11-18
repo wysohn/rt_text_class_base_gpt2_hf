@@ -27,7 +27,7 @@ class GPT2ModelWrapper(Model):
     def fit(self, X, y):
         X = self._batch_X(X)
         y = self._batch(y)
-        assert len(X) == len(y)
+        assert len(X) == len(y), '{}, {}'.format(X, y)
 
         optimizer = Adam(self.model.parameters(), lr=1e-5)
         history = History()

@@ -31,14 +31,20 @@ class GPT2Preprocessor(Preprocessor):
         print("Using pre-trained tokenizer for GPT2")
         self.label_encoder.fit(data[self.data_spec[Y_COL_KEY]])
 
+    def _sample(self, data: pd.Series):
+        if self.sample_size < len(data) and self.sample_size > 0:
+            return data.sample(self.sample_size)
+        else:
+            return data
+
     def transform(self, data) -> dict:
         X = data[self.data_spec[TEXT_COL_KEY]]
-        X = X.sample(self.sample_size) if self.sample_size > 0 else X
-        X = X.tolist()
+        X = self._sample(X)
         y = data[self.data_spec[Y_COL_KEY]]
+        y = self._sample(y)
 
         # {input_ids: N X MAX_LENGTH, attention_mask: N X 1}
-        X_dict = self.tokenizer(X,
+        X_dict = self.tokenizer(X.tolist(),
                                 padding='max_length',
                                 truncation=True,
                                 max_length=self.max_length,
