@@ -19,6 +19,7 @@ class GPT2Preprocessor(Preprocessor):
         self.data_spec = data_schema['inputDatasets'][SCHEMA_TYPE]
         self.batch_size = get_or_def(hyper_parameters, 'batch_size', 4)
         self.max_length = get_or_def(hyper_parameters, 'max_length', 64)
+        self.sample_size = get_or_def(hyper_parameters, 'sample_size', 10)
         self.padding_side = get_or_def(
             hyper_parameters, 'padding_side', 'right')
         self.tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
@@ -31,7 +32,9 @@ class GPT2Preprocessor(Preprocessor):
         self.label_encoder.fit(data[self.data_spec[Y_COL_KEY]])
 
     def transform(self, data) -> dict:
-        X = data[self.data_spec[TEXT_COL_KEY]].tolist()
+        X = data[self.data_spec[TEXT_COL_KEY]]
+        X = X.sample(self.sample_size) if self.sample_size > 0 else X
+        X = X.tolist()
         y = data[self.data_spec[Y_COL_KEY]]
 
         # {input_ids: N X MAX_LENGTH, attention_mask: N X 1}
