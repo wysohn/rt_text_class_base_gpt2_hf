@@ -1,3 +1,10 @@
+.vscode
+COMMAND.txt
+local_test/examples
+local_test/ml_vol
+
+!local_test/examples/hyperparameters.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,0 +1,50 @@
+#! /usr/bin/env python
+
+import sys
+import traceback
+
+from algorithm.data import data_loader
+from algorithm.data.history import save_training_history
+from algorithm.config import *
+from algorithm.model import Model, Preprocessor, load_or_fit
+
+
+def train():
+    try:
+        # Load configuarations and data
+        hyper_parameters = data_loader.get_hyperparameters(
+            MODEL_HYPERPARAMETERS_FILE_PATH)
+        data = data_loader.get_data(INPUT_DATA_FOLDER_PATH)
+        data_schema = data_loader.get_data_schema(
+            INPUT_DATA_CONFIG_FOLDER_PATH)
+
+        # Prepare preprocessor and model
+        preprocessor = Preprocessor(data_schema, hyper_parameters)
+        model = Model(hyper_parameters)
+
+        # Fit preprocessor or load existing preprocessor
+        load_or_fit(preprocessor, MODEL_PREPROCESSOR_WEIGHTS_FILE_PATH, data)
+        # Preprocess raw data
+        processed_data_dict = preprocessor.transform(data)
+        # Fit model
+        history = model.fit(**processed_data_dict)
+
+        # Save model weights
+        model.save_weights(MODEL_WEIGHTS_FILE_PATH)
+        # Save loss history
+        save_training_history(history, MODEL_HISTORY_FILE_PATH)
+    except Exception as e:
+        print("error!")
+        # Write out an error file. This will be returned as the failureReason to the client.
+        trc = traceback.format_exc()
+        with open(OUTPUT_ERROR_TRAIN_FAILURE_FILE_PATH, 'w') as s:
+            s.write('Exception during training: ' + str(e) + '\n' + trc)
+        # Printing this causes the exception to be in the training job logs, as well.
+        print('Exception during training: ' +
+              str(e) + '\n' + trc, file=sys.stderr)
+        # A non-zero exit code causes the training job to be marked as Failed.
+        sys.exit(255)
+
+
+if __name__ == '__main__':
+    train()

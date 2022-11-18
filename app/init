@@ -1,0 +1,10 @@
+#! /usr/bin/env python
+
+def init():
+    # download pre-trained model when container image is built
+    # download preprocessor when container image is built
+    pass
+
+
+if __name__ == '__main__':
+    init()
