@@ -32,7 +32,7 @@ def train():
         # Save model weights
         model.save_weights(MODEL_WEIGHTS_FILE_PATH)
         # Save loss history
-        save_training_history(history, MODEL_HISTORY_FILE_PATH)
+        save_training_history(history)
     except Exception as e:
         print("error!")
         # Write out an error file. This will be returned as the failureReason to the client.
