@@ -5,6 +5,9 @@ class Model:
     def __init__(self, model_config, hyper_parameters) -> None:
         pass
 
+    def model_name(self) -> str:
+        pass
+
     def fit(self, X, y):
         pass
 

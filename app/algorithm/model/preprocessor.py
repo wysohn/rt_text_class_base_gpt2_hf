@@ -1,6 +1,7 @@
 import os
 from typing import List
 import pandas as pd
+import numpy as np
 
 
 class Preprocessor:
@@ -10,7 +11,7 @@ class Preprocessor:
     def fit(self, data: pd.DataFrame):
         pass
 
-    def transform(self, data: pd.DataFrame) -> dict:
+    def transform(self, data: pd.DataFrame, include_label: bool) -> dict:
         pass
 
     def label_to_class(self, labels: List[int]) -> List[str]:
@@ -21,6 +22,10 @@ class Preprocessor:
         raise NotImplementedError(
             "num_classes is not supported by {}".format(self.__class__.__name__))
 
+    def class_names(self) -> List[str]:
+        raise NotImplementedError(
+            "class_names is not supported by {}".format(self.__class__.__name__))
+
     def class_distribution(self, inverse_prob=True):
         raise NotImplementedError(
             "class_distribution is not supported by {}".format(self.__class__.__name__))
@@ -29,6 +34,9 @@ class Preprocessor:
         pass
 
     def load_weights(self, model_folder_path, **kwargs):
+        pass
+
+    def post_processing(self, output: np.ndarray) -> pd.DataFrame:
         pass
 
 

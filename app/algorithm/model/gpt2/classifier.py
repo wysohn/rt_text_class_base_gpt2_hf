@@ -6,6 +6,7 @@ from torch import stack
 from torch.optim import Adam
 from torch.nn import CrossEntropyLoss
 from sklearn.metrics import confusion_matrix
+import numpy as np
 
 from ...data.history import History
 from ...utils import get_or_def, verify_folder
@@ -39,6 +40,9 @@ class GPT2ModelWrapper(Model):
             num_labels=model_config['num_labels'])
         self.model.config.pad_token_id = self.model.config.eos_token_id
 
+    def get_name(self):
+        return 'gpt2'
+
     def _batch_X(self, X):
         return [{'input_ids': input_ids_batch, 'attention_mask': attention_mask_batch}
                 for input_ids_batch, attention_mask_batch
@@ -66,7 +70,7 @@ class GPT2ModelWrapper(Model):
         optimizer = Adam(self.model.parameters(), lr=1e-5)
         loss_fct = CrossEntropyLoss(weight=torch.tensor(
             self.class_weights) if self.class_weights else None)
-        
+
         model_dev = self.model.to(dev)
         loss_fct_dev = loss_fct.to(dev)
 
@@ -94,9 +98,16 @@ class GPT2ModelWrapper(Model):
         return history
 
     def predict(self, input_ids, attention_mask):
-        classifier_output = self.model(input_ids=input_ids,
-                                       attention_mask=attention_mask)
-        return classifier_output.logits.detach().numpy()
+        X = self._batch_X(
+            {'input_ids': input_ids, 'attention_mask': attention_mask})
+
+        y_pred = []
+        for batch_x in X:
+            with torch.no_grad():
+                pred = self.model(**batch_x)
+            y_pred.extend(pred.logits.detach().numpy())
+
+        return np.stack(y_pred)
 
     def evaluate(self, X, y):
         y_true = y

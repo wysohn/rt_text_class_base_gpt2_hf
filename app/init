@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from algorithm.model import init_model, init_preprocessor
+from algorithm import init_model, init_preprocessor
 from algorithm.config import *
 
 model_download_config = {

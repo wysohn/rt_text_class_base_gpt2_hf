@@ -2,11 +2,13 @@
 
 # The function to execute the testing.
 import sys
+import os
 import traceback
 
-from algorithm.model import Model, Preprocessor
+from algorithm import Model, Preprocessor
+from algorithm import data_loader
+
 from algorithm.config import *
-from algorithm.data import data_loader
 
 
 def test():
@@ -17,13 +19,6 @@ def test():
         data = data_loader.get_data(INPUT_DATA_FOLDER_PATH)
         data_schema = data_loader.get_data_schema(
             INPUT_DATA_CONFIG_FOLDER_PATH)
-        model_save_config = {
-            'model_file_name': 'gpt2_model'
-        }
-        preprocessor_save_config = {
-            'tokenizer_file_name': 'gpt2_tokenizer',
-            'label_encoder_file_name': 'label_encoder.npy'
-        }
 
         # Prepare preprocessor
         preprocessor = Preprocessor({
@@ -32,7 +27,7 @@ def test():
 
         # load preprocessor saved data
         preprocessor.load_weights(
-            MODEL_ARTIFACT_FOLDER_PATH, **preprocessor_save_config)
+            MODEL_ARTIFACT_FOLDER_PATH, **PREPROCESSOR_SAVE_CONFIG)
 
         # Prepare model
         model = Model({
@@ -40,7 +35,8 @@ def test():
             'num_labels': preprocessor.num_classes(),
         }, hyper_parameters)
 
-        model.load_weights(MODEL_ARTIFACT_FOLDER_PATH, **model_save_config)
+        model.load_weights(MODEL_ARTIFACT_FOLDER_PATH,
+                           **MODEL_SAVE_CONFIG)
 
         # Preprocess raw test data
         processed_data_dict = preprocessor.transform(data)

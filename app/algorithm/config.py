@@ -21,6 +21,8 @@ OUTPUT_ERROR_TRAIN_FAILURE_FILE_PATH = os.path.join(
     OUTPUT_ERROR_FOLDER_PATH, 'train_failure')
 OUTPUT_ERROR_TEST_FAILURE_FILE_PATH = os.path.join(
     OUTPUT_ERROR_FOLDER_PATH, 'test_failure')
+OUTPUT_ERROR_SERVING_FAILURE_FILE_PATH = os.path.join(
+    OUTPUT_ERROR_FOLDER_PATH, 'serving_failure')
 
 MODEL_FOLDER_PATH = os.path.join(BASE_FOLDER_PATH, 'model')
 MODEL_CONFIG_FOLDER_PATH = os.path.join(MODEL_FOLDER_PATH, 'model_config')
@@ -31,3 +33,14 @@ MODEL_HISTORY_FILE_PATH = os.path.join(
     MODEL_ARTIFACT_FOLDER_PATH, 'history.json')
 
 PRETRAINED_MODEL_FOLDER_PATH = '/models'
+
+# Internal configs
+
+MODEL_SAVE_CONFIG = {
+    'model_file_name': 'gpt2_model'
+}
+PREPROCESSOR_SAVE_CONFIG = {
+    'tokenizer_file_name': 'gpt2_tokenizer',
+    'label_encoder_file_name': 'label_encoder.npy',
+    'label_distribution_file_name': 'label_distribution.npy'
+}

@@ -2,6 +2,8 @@ import json
 import os
 import pandas as pd
 
+from .data_schema import DataSchema
+
 
 def get_json_file(file_path, file_type):
     try:
@@ -29,7 +31,7 @@ def get_data(data_path: str) -> pd.DataFrame:
     return data
 
 
-def get_data_schema(data_schema_path: str):
+def get_data_schema(data_schema_path: str) -> DataSchema:
     try:
         json_files = list(filter(lambda f: f.endswith(
             '.json'), os.listdir(data_schema_path)))
@@ -39,7 +41,7 @@ def get_data_schema(data_schema_path: str):
         full_fpath = os.path.join(data_schema_path, json_files[0])
         with open(full_fpath, 'r') as f:
             data_schema = json.load(f)
-            return data_schema
+            return DataSchema(data_schema)
     except:
         raise Exception(
             f"Error reading data_schema file at: {data_schema_path}")

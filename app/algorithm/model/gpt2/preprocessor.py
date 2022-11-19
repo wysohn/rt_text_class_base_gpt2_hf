@@ -1,13 +1,16 @@
 import numpy
 import pandas as pd
 import torch
+import numpy as np
 
 from transformers import GPT2Tokenizer
 from sklearn.preprocessing import LabelEncoder
+from scipy.special import softmax
 
 from ..preprocessor import Preprocessor
 from ...config import *
 from ...utils import get_or_def, verify_folder
+from ...data.data_schema import DataSchema
 
 
 TEXT_COL_KEY = 'documentField'
@@ -27,8 +30,8 @@ def init_preprocessor(folder_path, **kwargs):
 
 
 class GPT2Preprocessor(Preprocessor):
-    def __init__(self, preprocessor_config, data_schema, hyper_parameters):
-        self.data_spec = data_schema['inputDatasets'][SCHEMA_TYPE]
+    def __init__(self, preprocessor_config, data_schema: DataSchema, hyper_parameters):
+        self.data_schema = data_schema
         self.batch_size = get_or_def(hyper_parameters, 'batch_size', 4)
         self.max_length = get_or_def(hyper_parameters, 'max_length', 64)
         self.sample_size = get_or_def(hyper_parameters, 'sample_size', 0)
@@ -42,8 +45,8 @@ class GPT2Preprocessor(Preprocessor):
         self.tokenizer.pad_token = '[PAD]'
 
     def fit(self, data: pd.DataFrame):
-        self.label_encoder.fit(data[self.data_spec[Y_COL_KEY]])
-        self.label_distribution = data[self.data_spec[Y_COL_KEY]].value_counts(
+        self.label_encoder.fit(data[self.data_schema.col_label_key()])
+        self.label_distribution = data[self.data_schema.col_label_key()].value_counts(
             normalize=True).to_dict()
 
     def _sample(self, data: pd.Series):
@@ -52,11 +55,15 @@ class GPT2Preprocessor(Preprocessor):
         else:
             return data
 
-    def transform(self, data) -> dict:
-        X = data[self.data_spec[TEXT_COL_KEY]]
+    def transform(self, data, include_label=True) -> dict:
+        X = data[self.data_schema.col_text_key()]
         X = self._sample(X)
-        y = data[self.data_spec[Y_COL_KEY]]
-        y = self._sample(y)
+        if include_label:
+            y = data[self.data_schema.col_label_key()]
+            y = self._sample(y)
+
+            y = self.label_encoder.transform(y)
+            y = torch.tensor(y)
 
         # {input_ids: N X MAX_LENGTH, attention_mask: N X 1}
         X_dict = self.tokenizer(X.tolist(),
@@ -65,12 +72,16 @@ class GPT2Preprocessor(Preprocessor):
                                 max_length=self.max_length,
                                 return_tensors='pt')
 
-        y = self.label_encoder.transform(y)
-        y = torch.tensor(y)
-        return {'X': X_dict, 'y': y}
+        out = {'X': X_dict}
+        if include_label:
+            out['y'] = y
+        return out
 
     def label_to_class(self, labels):
         return self.label_encoder.inverse_transform(labels)
+
+    def class_names(self):
+        return self.label_encoder.classes_.tolist()
 
     def num_classes(self):
         return len(self.label_encoder.classes_)
@@ -95,6 +106,11 @@ class GPT2Preprocessor(Preprocessor):
         numpy.save(label_encoder_path, self.label_encoder.classes_)
         print("Label encoder saved to {}".format(label_encoder_path))
 
+        label_distribution_path = os.path.join(
+            model_folder_path, kwargs['label_distribution_file_name'])
+        numpy.save(label_distribution_path, self.label_distribution)
+        print("Label distribution saved to {}".format(label_distribution_path))
+
     def load_weights(self, model_folder_path, **kwargs):
         verify_folder(model_folder_path)
 
@@ -110,3 +126,16 @@ class GPT2Preprocessor(Preprocessor):
             self.label_encoder.classes_ = numpy.load(
                 label_encoder_path, allow_pickle=True)
             print("Label encoder loaded from {}".format(label_encoder_path))
+
+        label_distribution_path = os.path.join(
+            model_folder_path, kwargs['label_distribution_file_name'])
+        if os.path.exists(label_distribution_path):
+            self.label_distribution = numpy.load(
+                label_distribution_path, allow_pickle=True).item()
+            print("Label distribution loaded from {}".format(
+                label_distribution_path))
+
+    def post_processing(self, output: np.ndarray) -> pd.DataFrame:
+        classes = self.class_names()
+        output = softmax(output, axis=-1)
+        return pd.DataFrame(output, columns=classes)

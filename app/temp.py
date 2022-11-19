@@ -1,8 +1,11 @@
 from algorithm.model import Model, Preprocessor, init_model, init_preprocessor
+from algorithm.config import *
+
 import pandas as pd
 import torch
 
 from algorithm.data import data_loader
+from algorithm.data.data_schema import DataSchema
 
 MODEL_ARTIFACT_FOLDER_PATH = 'local_test/ml_vol/model/artifacts'
 INPUT_DATA_FOLDER_PATH = 'local_test/ml_vol/inputs/data/testing/textClassificationBaseMainInput'
@@ -23,7 +26,7 @@ if __name__ == '__main__':
 
     data = data_loader.get_data(INPUT_DATA_FOLDER_PATH)
 
-    data_schema = {
+    data_schema = DataSchema({
         "problemCategory": "text_classification_base",
         "version": "1.0",
         "language": "en-us",
@@ -34,37 +37,32 @@ if __name__ == '__main__':
                 "targetField": "Category",
                 "documentField": "Message"
             }
-        }}
+        }})
 
     preprocessor = Preprocessor({
         'tokenizer_path': 'local_test/model/gpt2_tokenizer',
     }, data_schema, hyper_parameters)
-
-    model_save_config = {
-        'model_file_name': 'gpt2_model'
-    }
-    preprocessor_save_config = {
-        'tokenizer_file_name': 'gpt2_tokenizer',
-        'label_encoder_file_name': 'label_encoder.npy'
-    }
 
     preprocessor = Preprocessor({
         'tokenizer_path': 'local_test/model/gpt2_tokenizer'
     }, data_schema, hyper_parameters)
 
     preprocessor.load_weights(
-        MODEL_ARTIFACT_FOLDER_PATH, **preprocessor_save_config)
+        MODEL_ARTIFACT_FOLDER_PATH, **PREPROCESSOR_SAVE_CONFIG)
 
     # Prepare model
     model = Model({
         'model_path': 'local_test/model/gpt2_pretrained',
         'num_labels': preprocessor.num_classes(),
-        'class_weights': preprocessor.class_distribution(),
     }, hyper_parameters)
 
-    model.load_weights(MODEL_ARTIFACT_FOLDER_PATH, **model_save_config)
+    model.load_weights(MODEL_ARTIFACT_FOLDER_PATH, **MODEL_SAVE_CONFIG)
 
     # Preprocess raw test data
-    processed_data_dict = preprocessor.transform(data)
+    processed_data_dict = preprocessor.transform(data, False)
     # evaluate model
-    print("loss: {}".format(model.evaluate(**processed_data_dict)))
+    # print("loss: {}".format(model.evaluate(**processed_data_dict)))
+    # predict
+    output = model.predict(**processed_data_dict['X'])
+    output = preprocessor.post_processing(output)
+    print(output)
