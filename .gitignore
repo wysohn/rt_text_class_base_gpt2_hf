@@ -2,6 +2,7 @@
 COMMAND.txt
 local_test/examples
 local_test/ml_vol
+local_test/model
 
 !local_test/examples/hyperparameters.json
 

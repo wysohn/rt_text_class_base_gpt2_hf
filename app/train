@@ -17,20 +17,39 @@ def train():
         data = data_loader.get_data(INPUT_DATA_FOLDER_PATH)
         data_schema = data_loader.get_data_schema(
             INPUT_DATA_CONFIG_FOLDER_PATH)
+        model_save_config = {
+            'model_file_name': 'gpt2_model'
+        }
+        preprocessor_save_config = {
+            'tokenizer_file_name': 'gpt2_tokenizer',
+            'label_encoder_file_name': 'label_encoder.npy'
+        }
 
-        # Prepare preprocessor and model
-        preprocessor = Preprocessor(data_schema, hyper_parameters)
-        model = Model(hyper_parameters)
+        # Prepare preprocessor
+        preprocessor = Preprocessor({
+            'tokenizer_path': os.path.join(PRETRAINED_MODEL_FOLDER_PATH, 'gpt2_tokenizer')
+        }, data_schema, hyper_parameters)
 
-        # Fit preprocessor or load existing preprocessor
-        load_or_fit(preprocessor, MODEL_PREPROCESSOR_WEIGHTS_FILE_PATH, data)
+        # fit preprocessor on training data
+        preprocessor.fit(data)
+
+        # Prepare model
+        model = Model({
+            'model_path': os.path.join(PRETRAINED_MODEL_FOLDER_PATH, 'gpt2_pretrained'),
+            'num_labels': preprocessor.num_classes(),
+            'class_weights': preprocessor.class_distribution(),
+        }, hyper_parameters)
+
         # Preprocess raw data
         processed_data_dict = preprocessor.transform(data)
         # Fit model
         history = model.fit(**processed_data_dict)
 
         # Save model weights
-        model.save_weights(MODEL_WEIGHTS_FILE_PATH)
+        model.save_weights(MODEL_ARTIFACT_FOLDER_PATH, **model_save_config)
+        # Save preprocessor weights
+        preprocessor.save_weights(
+            MODEL_ARTIFACT_FOLDER_PATH, **preprocessor_save_config)
         # Save loss history
         save_training_history(history)
     except Exception as e:

@@ -1,9 +1,24 @@
 #! /usr/bin/env python
 
+from algorithm.model import init_model, init_preprocessor
+from algorithm.config import *
+
+model_download_config = {
+    'model_file_name': 'gpt2_pretrained',
+}
+
+preprocessor_download_config = {
+    'tokenizer_file_name': 'gpt2_tokenizer',
+}
+
+
 def init():
     # download pre-trained model when container image is built
+    init_model(PRETRAINED_MODEL_FOLDER_PATH, **model_download_config)
+
     # download preprocessor when container image is built
-    pass
+    init_preprocessor(PRETRAINED_MODEL_FOLDER_PATH,
+                      **preprocessor_download_config)
 
 
 if __name__ == '__main__':

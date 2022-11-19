@@ -1,9 +1,10 @@
 import os
+from typing import List
 import pandas as pd
 
 
 class Preprocessor:
-    def __init__(self, data_schema, hyper_parameters):
+    def __init__(self, preprocessor_config, data_schema, hyper_parameters):
         pass
 
     def fit(self, data: pd.DataFrame):
@@ -12,10 +13,22 @@ class Preprocessor:
     def transform(self, data: pd.DataFrame) -> dict:
         pass
 
-    def save_weights(self, model_path):
+    def label_to_class(self, labels: List[int]) -> List[str]:
+        raise NotImplementedError(
+            "label_to_class is not supported by {}".format(self.__class__.__name__))
+
+    def num_classes(self):
+        raise NotImplementedError(
+            "num_classes is not supported by {}".format(self.__class__.__name__))
+
+    def class_distribution(self, inverse_prob=True):
+        raise NotImplementedError(
+            "class_distribution is not supported by {}".format(self.__class__.__name__))
+
+    def save_weights(self, model_folder_path, **kwargs):
         pass
 
-    def load_weights(self, model_path):
+    def load_weights(self, model_folder_path, **kwargs):
         pass
 
 

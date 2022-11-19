@@ -1,0 +1,64 @@
+#! /usr/bin/env python
+
+# The function to execute the testing.
+import sys
+import traceback
+
+from algorithm.model import Model, Preprocessor
+from algorithm.config import *
+from algorithm.data import data_loader
+
+
+def test():
+    try:
+        # Load configuarations and data
+        hyper_parameters = data_loader.get_hyperparameters(
+            MODEL_HYPERPARAMETERS_FILE_PATH)
+        data = data_loader.get_data(INPUT_DATA_FOLDER_PATH)
+        data_schema = data_loader.get_data_schema(
+            INPUT_DATA_CONFIG_FOLDER_PATH)
+        model_save_config = {
+            'model_file_name': 'gpt2_model'
+        }
+        preprocessor_save_config = {
+            'tokenizer_file_name': 'gpt2_tokenizer',
+            'label_encoder_file_name': 'label_encoder.npy'
+        }
+
+        # Prepare preprocessor
+        preprocessor = Preprocessor({
+            'tokenizer_path': os.path.join(PRETRAINED_MODEL_FOLDER_PATH, 'gpt2_tokenizer')
+        }, data_schema, hyper_parameters)
+
+        # load preprocessor saved data
+        preprocessor.load_weights(
+            MODEL_ARTIFACT_FOLDER_PATH, **preprocessor_save_config)
+
+        # Prepare model
+        model = Model({
+            'model_path': os.path.join(PRETRAINED_MODEL_FOLDER_PATH, 'gpt2_pretrained'),
+            'num_labels': preprocessor.num_classes(),
+        }, hyper_parameters)
+
+        model.load_weights(MODEL_ARTIFACT_FOLDER_PATH, **model_save_config)
+
+        # Preprocess raw test data
+        processed_data_dict = preprocessor.transform(data)
+        # evaluate model
+        print("loss: {}".format(model.evaluate(**processed_data_dict)))
+
+    except Exception as e:
+        print("error!")
+        # Write out an error file. This will be returned as the failureReason to the client.
+        trc = traceback.format_exc()
+        with open(OUTPUT_ERROR_TEST_FAILURE_FILE_PATH, 'w') as s:
+            s.write('Exception during training: ' + str(e) + '\n' + trc)
+        # Printing this causes the exception to be in the training job logs, as well.
+        print('Exception during testing: ' +
+              str(e) + '\n' + trc, file=sys.stderr)
+        # A non-zero exit code causes the training job to be marked as Failed.
+        sys.exit(255)
+
+
+if __name__ == '__main__':
+    test()
