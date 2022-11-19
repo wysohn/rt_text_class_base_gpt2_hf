@@ -21,6 +21,7 @@ ENV PYTHONUNBUFFERED=TRUE
 ENV PYTHONDONTWRITEBYTECODE=TRUE
 ENV PATH="/opt/app:${PATH}"
 
+RUN chmod +x init
 RUN init
 
 RUN chmod +x train &&\
