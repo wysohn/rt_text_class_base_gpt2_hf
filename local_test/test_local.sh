@@ -3,6 +3,11 @@
 
 
 image=$1
+if [ $# -eq 2 ]
+then
+    gpu="--gpus ${2}"
+fi
+
 
 
 mkdir -p ml_vol/inputs/data_config
@@ -23,4 +28,5 @@ cp examples/abalone_test.csv ml_vol/inputs/data/testing/textClassificationBaseMa
 cp examples/abalone_test_key.csv ml_vol/inputs/data/testing/textClassificationBaseMainInput
 cp examples/hyperparameters.json ml_vol/model/model_config
 
-docker run -v $(pwd)/ml_vol:/opt/ml_vol -e CHANNEL=testing --rm ${image} test
+echo ${gpu}
+docker run -v $(pwd)/ml_vol:/opt/ml_vol -e CHANNEL=testing ${gpu} --rm ${image} test

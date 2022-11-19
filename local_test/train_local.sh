@@ -1,6 +1,10 @@
 #!/bin/sh
 
 image=$1
+if [ $# -eq 2 ]
+then
+    gpu="--gpus ${2}"
+fi
 
 
 mkdir -p ml_vol/inputs/data_config
@@ -20,4 +24,5 @@ cp examples/abalone_schema.json ml_vol/inputs/data_config
 cp examples/abalone_train.csv ml_vol/inputs/data/training/textClassificationBaseMainInput
 cp examples/hyperparameters.json ml_vol/model/model_config
 
-docker run -v $(pwd)/ml_vol:/opt/ml_vol --rm ${image} train
+echo ${gpu}
+docker run -v $(pwd)/ml_vol:/opt/ml_vol ${gpu} --rm ${image} train

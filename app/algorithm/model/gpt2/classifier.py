@@ -47,7 +47,16 @@ class GPT2ModelWrapper(Model):
     def _batch(self, data):
         return [data[i:i + self.batch_size] for i in range(0, len(data), self.batch_size)]
 
+    def _transfer_X(self, X, dev):
+        return {k: v.to(dev) for k, v in X.items()}
+
     def fit(self, X, y):
+        print("CUDA available:", torch.cuda.is_available())
+        if torch.cuda.is_available():
+            dev = torch.device('cuda')
+        else:
+            dev = torch.device('cpu')
+
         X = self._batch_X(X)
         y = self._batch(y)
         assert len(X) == len(y), '{}, {}'.format(X, y)
@@ -57,13 +66,20 @@ class GPT2ModelWrapper(Model):
         optimizer = Adam(self.model.parameters(), lr=1e-5)
         loss_fct = CrossEntropyLoss(weight=torch.tensor(
             self.class_weights) if self.class_weights else None)
+        
+        model_dev = self.model.to(dev)
+        loss_fct_dev = loss_fct.to(dev)
+
         history = History()
         for epoch in range(self.epoch):
             loss_sum = 0
             iterations = 0
             for batch_x, batch_y in zip(X, y):
-                pred = self.model(**batch_x)
-                loss = loss_fct(pred.logits, batch_y)
+                batch_x_dev = self._transfer_X(batch_x, dev)
+                batch_y_dev = batch_y.to(dev)
+
+                pred = model_dev(**batch_x_dev)
+                loss = loss_fct_dev(pred.logits, batch_y_dev)
 
                 loss.backward()
                 optimizer.step()
