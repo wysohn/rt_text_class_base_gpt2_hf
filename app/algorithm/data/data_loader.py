@@ -45,3 +45,8 @@ def get_data_schema(data_schema_path: str) -> DataSchema:
     except:
         raise Exception(
             f"Error reading data_schema file at: {data_schema_path}")
+
+
+def save_predictions(predictions: pd.DataFrame, folder_path: str):
+    predictions.to_csv(os.path.join(
+        folder_path, 'test_predictions.csv'), index=False)

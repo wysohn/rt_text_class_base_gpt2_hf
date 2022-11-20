@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 # The function to execute the testing.
+import io
 import sys
 import os
 import traceback
@@ -23,7 +24,7 @@ def test():
         # Prepare preprocessor
         preprocessor = Preprocessor({
             'tokenizer_path': os.path.join(PRETRAINED_MODEL_FOLDER_PATH, 'gpt2_tokenizer')
-        }, data_schema, hyper_parameters)
+        }, data_schema, {**hyper_parameters, **{'sample_size': 0}})  # testing uses all samples
 
         # load preprocessor saved data
         preprocessor.load_weights(
@@ -40,8 +41,21 @@ def test():
 
         # Preprocess raw test data
         processed_data_dict = preprocessor.transform(data)
-        # evaluate model
-        print("loss: {}".format(model.evaluate(**processed_data_dict)))
+        # # evaluate model
+        # print("loss: {}".format(model.evaluate(**processed_data_dict)))
+
+        # Make predictions
+        predictions = model.predict(**processed_data_dict['X'])
+        predictions = preprocessor.post_processing(predictions)
+
+        # Convert from dataframe to CSV
+        out = io.StringIO()
+        predictions.to_csv(out, index=False)
+        result = out.getvalue()
+
+        # Save predictions
+        data_loader.save_predictions(
+            predictions, OUTPUT_TESTING_FOLDER_PATH)
 
     except Exception as e:
         print("error!")

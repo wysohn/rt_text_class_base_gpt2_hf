@@ -19,6 +19,7 @@ mkdir -p ml_vol/model/artifacts
 mkdir -p ml_vol/hpt/results
 
 mkdir -p ml_vol/outputs
+mkdir -p ml_vol/outputs/testing_outputs
 mkdir -p ml_vol/outputs/errors
 
 chmod 777 ml_vol/model

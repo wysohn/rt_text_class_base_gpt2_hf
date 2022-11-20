@@ -16,6 +16,8 @@ INPUT_DATA_FOLDER_PATH = os.path.join(
 INPUT_DATA_CONFIG_FOLDER_PATH = os.path.join(INPUT_FOLDER_PATH, 'data_config')
 
 OUTPUT_FOLDER_PATH = os.path.join(BASE_FOLDER_PATH, 'outputs')
+OUTPUT_TESTING_FOLDER_PATH = os.path.join(
+    OUTPUT_FOLDER_PATH, 'testing_outputs')
 OUTPUT_ERROR_FOLDER_PATH = os.path.join(OUTPUT_FOLDER_PATH, 'errors')
 OUTPUT_ERROR_TRAIN_FAILURE_FILE_PATH = os.path.join(
     OUTPUT_ERROR_FOLDER_PATH, 'train_failure')
