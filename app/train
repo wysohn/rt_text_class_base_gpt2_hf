@@ -38,7 +38,7 @@ def train():
         # Preprocess raw data
         processed_data_dict = preprocessor.transform(data)
         # Fit model
-        history = model.fit(**processed_data_dict)
+        history = model.fit(processed_data_dict['X'], processed_data_dict['y'])
 
         # Save model weights
         model.save_weights(MODEL_ARTIFACT_FOLDER_PATH,

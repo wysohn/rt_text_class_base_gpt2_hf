@@ -48,6 +48,10 @@ def test():
         predictions = model.predict(processed_data_dict['X'])
         predictions = preprocessor.post_processing(predictions)
 
+        # Append ids to predictions
+        predictions.insert(0, data_schema.col_id_key(),
+                           processed_data_dict['ids'])
+
         # Save predictions
         data_loader.save_predictions(
             predictions, OUTPUT_TESTING_FOLDER_PATH)

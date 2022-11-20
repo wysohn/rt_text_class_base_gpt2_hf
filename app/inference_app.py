@@ -79,9 +79,15 @@ def infer():
     try:
         # Preprocess raw test data
         processed_data_dict = preprocessor.transform(data, False)
+
         # Make predictions
         predictions = model.predict(processed_data_dict['X'])
         predictions = preprocessor.post_processing(predictions)
+
+        # Append ids to predictions
+        predictions.insert(0, data_schema.col_id_key(),
+                           processed_data_dict['ids'])
+
         # Convert from dataframe to CSV
         out = io.StringIO()
         predictions.to_csv(out, index=False)

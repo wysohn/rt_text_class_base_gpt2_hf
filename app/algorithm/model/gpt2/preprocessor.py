@@ -56,6 +56,7 @@ class GPT2Preprocessor(Preprocessor):
             return data
 
     def transform(self, data, include_label=True) -> dict:
+        ids = data[self.data_schema.col_id_key()]
         X = data[self.data_schema.col_text_key()]
         X = self._sample(X)
         if include_label:
@@ -72,7 +73,7 @@ class GPT2Preprocessor(Preprocessor):
                                 max_length=self.max_length,
                                 return_tensors='pt')
 
-        out = {'X': X_dict}
+        out = {'ids': ids, 'X': X_dict}
         if include_label:
             out['y'] = y
         return out
