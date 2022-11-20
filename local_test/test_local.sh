@@ -26,7 +26,6 @@ chmod 777 ml_vol/model
 
 cp examples/abalone_schema.json ml_vol/inputs/data_config
 cp examples/abalone_test.csv ml_vol/inputs/data/testing/textClassificationBaseMainInput
-cp examples/abalone_test_key.csv ml_vol/inputs/data/testing/textClassificationBaseMainInput
 cp examples/hyperparameters.json ml_vol/model/model_config
 
 echo ${gpu}
