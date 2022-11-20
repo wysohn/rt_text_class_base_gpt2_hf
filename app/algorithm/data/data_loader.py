@@ -24,10 +24,7 @@ def get_data(data_path: str) -> pd.DataFrame:
     if len(input_files) == 0:
         raise ValueError(f'There are no data files in {data_path}.')
     raw_data = [pd.read_csv(file) for file in input_files]
-    # data = pd.concat(raw_data)
-    data = raw_data[0].set_index('Id')
-    for i in range(1, len(raw_data)):
-        data = data.join(raw_data[i].set_index('Id'))
+    data = pd.concat(raw_data)
     return data
 
 
