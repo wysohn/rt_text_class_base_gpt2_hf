@@ -40,18 +40,13 @@ def test():
                            **MODEL_SAVE_CONFIG)
 
         # Preprocess raw test data
-        processed_data_dict = preprocessor.transform(data)
+        processed_data_dict = preprocessor.transform(data, False)
         # # evaluate model
         # print("loss: {}".format(model.evaluate(**processed_data_dict)))
 
         # Make predictions
         predictions = model.predict(processed_data_dict['X'])
         predictions = preprocessor.post_processing(predictions)
-
-        # Convert from dataframe to CSV
-        out = io.StringIO()
-        predictions.to_csv(out, index=False)
-        result = out.getvalue()
 
         # Save predictions
         data_loader.save_predictions(
