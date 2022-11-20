@@ -97,9 +97,8 @@ class GPT2ModelWrapper(Model):
 
         return history
 
-    def predict(self, input_ids, attention_mask):
-        X = self._batch_X(
-            {'input_ids': input_ids, 'attention_mask': attention_mask})
+    def predict(self, X):
+        X = self._batch_X(X)
 
         y_pred = []
         for batch_x in X:
@@ -129,7 +128,8 @@ class GPT2ModelWrapper(Model):
             loss_sum += loss.item()
             iterations += 1
 
-        return loss_sum / iterations, confusion_matrix(y_true, y_pred)
+        return {'loss': loss_sum / iterations,
+                'confusion_matrix': confusion_matrix(y_true, y_pred)}
 
     def save_weights(self, model_folder_path, **kwargs):
         verify_folder(model_folder_path)

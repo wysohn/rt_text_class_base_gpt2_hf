@@ -80,7 +80,7 @@ def infer():
         # Preprocess raw test data
         processed_data_dict = preprocessor.transform(data, False)
         # Make predictions
-        predictions = model.predict(**processed_data_dict['X'])
+        predictions = model.predict(processed_data_dict['X'])
         predictions = preprocessor.post_processing(predictions)
         # Convert from dataframe to CSV
         out = io.StringIO()

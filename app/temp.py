@@ -63,6 +63,6 @@ if __name__ == '__main__':
     # evaluate model
     # print("loss: {}".format(model.evaluate(**processed_data_dict)))
     # predict
-    output = model.predict(**processed_data_dict['X'])
+    output = model.predict(**processed_data_dict)
     output = preprocessor.post_processing(output)
     print(output)
