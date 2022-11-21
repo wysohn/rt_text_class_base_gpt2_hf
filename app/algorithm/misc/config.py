@@ -1,10 +1,14 @@
 import os
 
+VERSION = '0.0.1'
+
 BASE_FOLDER_PATH = os.getenv('BASE_PATH', '/opt/ml_vol')
 CHANNEL = os.getenv('CHANNEL', 'training')
 SCHEMA_TYPE = os.getenv('SCHEMA_TYPE', 'textClassificationBaseMainInput')
+EVALUATE = os.getenv('EVALUATE', 'False') == 'True'
 
 print('Settings: {}'.format({
+    'VERSION': VERSION,
     'BASE_FOLDER_PATH': BASE_FOLDER_PATH,
     'CHANNEL': CHANNEL,
     'SCHEMA_TYPE': SCHEMA_TYPE
