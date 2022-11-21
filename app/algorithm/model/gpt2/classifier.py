@@ -25,7 +25,8 @@ class GPT2ModelWrapper(Model):
         self.model = GPT2ForSequenceClassification.from_pretrained(
             model_config['model_path'],
             local_files_only=True,
-            num_labels=model_config['num_labels'])
+            num_labels=model_config['num_labels'],
+            ignore_mismatched_sizes=True)
         self.model.config.pad_token_id = self.model.config.eos_token_id
 
     def get_name(self):
