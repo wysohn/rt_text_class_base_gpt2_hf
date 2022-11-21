@@ -9,7 +9,7 @@ import traceback
 from algorithm import Model, Preprocessor
 from algorithm import data_loader
 
-from algorithm.config import *
+from algorithm.misc.config import *
 
 
 def test():

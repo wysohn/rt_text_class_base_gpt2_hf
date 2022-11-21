@@ -1,10 +1,10 @@
 # major part of code sourced from aws sagemaker example:
 # https://github.com/aws/amazon-sagemaker-examples/blob/main/advanced_functionality/scikit_bring_your_own/container/decision_trees/predictor.py
 
-from algorithm.config import *
+from algorithm.misc.config import *
 from algorithm import Model, Preprocessor, data_loader
+import algorithm.misc.utils as utils
 
-import algorithm.utils as utils
 import io
 import pandas as pd
 import json

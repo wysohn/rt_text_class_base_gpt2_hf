@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from ..config import *
+from ..misc.config import *
 
 
 class History:

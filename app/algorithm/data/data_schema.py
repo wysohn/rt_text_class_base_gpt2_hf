@@ -1,4 +1,4 @@
-from ..config import *
+from ..misc.config import *
 
 ID_COL_KEY = 'idField'
 TEXT_COL_KEY = 'documentField'

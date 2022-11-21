@@ -8,7 +8,7 @@ from algorithm import data_loader
 from algorithm import save_training_history
 from algorithm import Model, Preprocessor
 
-from algorithm.config import *
+from algorithm.misc.config import *
 
 
 def train():
