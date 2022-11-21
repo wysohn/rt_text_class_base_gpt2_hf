@@ -17,6 +17,7 @@ class GPT2ModelWrapper(Model):
     def __init__(self, model_config, hyper_parameters):
         self.batch_size = get_or_def(hyper_parameters, 'batch_size', 4)
         self.epoch = get_or_def(hyper_parameters, 'epoch', 32)
+        self.learning_rate = get_or_def(hyper_parameters, 'learning_rate', 0.00001)
         self.class_weights = get_or_def(model_config, 'class_weights', None)
         self.num_labels = get_or_def(model_config, 'num_labels', 2)
         assert self.class_weights is None or len(
@@ -56,7 +57,7 @@ class GPT2ModelWrapper(Model):
 
         print("class weights: {}".format(self.class_weights))
 
-        optimizer = Adam(self.model.parameters(), lr=1e-5)
+        optimizer = Adam(self.model.parameters(), lr=self.learning_rate)
         loss_fct = CrossEntropyLoss(weight=torch.tensor(
             self.class_weights) if self.class_weights else None)
 
