@@ -40,9 +40,21 @@ def test():
                            **MODEL_SAVE_CONFIG)
 
         # Preprocess raw test data
-        processed_data_dict = preprocessor.transform(data, False)
+        if EVALUATE_FILE:
+            path = os.path.join(
+                INPUT_DATA_TEST_KEY_FOLDER_PATH, EVALUATE_FILE)
+            data = data_loader.attach_test_labels(
+                data, path, data_schema.col_label_key())
+            print(data)
+
+        processed_data_dict = preprocessor.transform(
+            data, EVALUATE_FILE is not None)
+
         # # evaluate model
-        # print("loss: {}".format(model.evaluate(**processed_data_dict)))
+        if EVALUATE_FILE:
+            print("Evaluating model against {}".format(EVALUATE_FILE))
+            print("loss: {}".format(model.evaluate(processed_data_dict['X'],
+                                                   processed_data_dict['y'])))
 
         # Make predictions
         predictions = model.predict(processed_data_dict['X'])

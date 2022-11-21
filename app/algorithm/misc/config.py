@@ -5,7 +5,7 @@ VERSION = '0.0.1'
 BASE_FOLDER_PATH = os.getenv('BASE_PATH', '/opt/ml_vol')
 CHANNEL = os.getenv('CHANNEL', 'training')
 SCHEMA_TYPE = os.getenv('SCHEMA_TYPE', 'textClassificationBaseMainInput')
-EVALUATE = os.getenv('EVALUATE', 'False') == 'True'
+EVALUATE_FILE = os.getenv('EVALUATE_FILE', None)
 
 print('Settings: {}'.format({
     'VERSION': VERSION,
@@ -18,6 +18,7 @@ INPUT_FOLDER_PATH = os.path.join(BASE_FOLDER_PATH, 'inputs')
 INPUT_DATA_FOLDER_PATH = os.path.join(
     INPUT_FOLDER_PATH, 'data', CHANNEL, SCHEMA_TYPE)
 INPUT_DATA_CONFIG_FOLDER_PATH = os.path.join(INPUT_FOLDER_PATH, 'data_config')
+INPUT_DATA_TEST_KEY_FOLDER_PATH = os.path.join(INPUT_DATA_FOLDER_PATH, 'keys')
 
 OUTPUT_FOLDER_PATH = os.path.join(BASE_FOLDER_PATH, 'outputs')
 OUTPUT_TESTING_FOLDER_PATH = os.path.join(

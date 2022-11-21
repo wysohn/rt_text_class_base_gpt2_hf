@@ -28,6 +28,12 @@ def get_data(data_path: str) -> pd.DataFrame:
     return data
 
 
+def attach_test_labels(data: pd.DataFrame, test_labels_path: str, label_key: str) -> pd.DataFrame:
+    test_labels = pd.read_csv(test_labels_path)
+    data[label_key] = test_labels[label_key]
+    return data
+
+
 def get_data_schema(data_schema_path: str) -> DataSchema:
     try:
         json_files = list(filter(lambda f: f.endswith(
